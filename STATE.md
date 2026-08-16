@@ -1,7 +1,7 @@
 # DicTopia Implementation State
 
 ## 現在のIssue
-Issue 4-6: Hall of Fame
+Issue 5-1: Seed データ
 
 ## 完了Issue
 - [x] Phase 1: 基盤・DBセットアップ（Issue 1-1〜1-3）
@@ -13,18 +13,21 @@ Issue 4-6: Hall of Fame
 - [x] Issue 4-4: WordCard関連
 - [x] Issue 4-5: `/word/[id]` 造語個別ページ
 - [x] Issue 4-6: Hall of Fame
+- [x] Issue 5-1: Seed データ
 
 ## 進行中Issueの状況
-- `app/hall-of-fame/page.tsx` を追加
-  - 公開済みの `words` と `topics` を取得
-  - `topic.week_code` ごとに `votes_count` 上位 10 件を表示
+- `supabase/seed.sql` を更新
+  - 2 週分のお題（2026-W33, 2026-W34）を追加
+  - 各週に 10 件ずつ、計 20 件のサンプル造語を追加
+  - `topic_id` を週ごとに紐付け
+  - `ai_context_tags` / `ai_search_summary` を一部に設定
 - `npx tsc --noEmit` 成功
 - `npm run build` 成功
+- 備考：ローカルの Docker デーモンが停止中のため、`npx supabase db reset` は未実施
 
 ## 直近の失敗と原因
-- `Word` 型に `week_code` がないことが判明
-  → `topic.week_code` から取得し、週ごとにグループ化するよう修正
+- なし
 
 ## 次回の着手事項
 - PR 作成後、人間の承認を待つ
-- Phase 4 全完了の報告・Phase 5 進行確認
+- Issue 5-2（統合テスト）に進む
