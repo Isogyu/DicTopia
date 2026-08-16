@@ -1,4 +1,11 @@
+"use client";
+
+import { useState } from "react";
 import Link from "next/link";
+import { VoteButton } from "./vote-button";
+import { ReactionBar } from "./reaction-bar";
+import { ShareButton } from "./share-button";
+import { ReportFlag } from "./report-flag";
 import type { Word } from "@/types/database";
 
 interface WordCardProps {
@@ -9,27 +16,23 @@ interface WordCardProps {
 
 export function WordCard({ word, variant = "newest", rank }: WordCardProps) {
   const isLeaderboard = variant === "leaderboard";
+  const [votesCount, setVotesCount] = useState(word.votes_count);
 
   return (
-    <Link
-      href={`/word/${word.id}`}
-      className="group block rounded-lg border border-border bg-card p-4 text-card-foreground shadow-sm transition-colors hover:border-primary/50 hover:bg-accent"
-    >
+    <div className="rounded-lg border border-border bg-card p-4 text-card-foreground shadow-sm transition-colors hover:border-primary/50">
       <div className="flex items-start gap-4">
         {isLeaderboard && rank !== undefined && (
           <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary text-sm font-bold text-primary-foreground">
             {rank}
           </span>
         )}
-        <div className="flex-1 space-y-1">
-          <div className="flex items-center justify-between gap-2">
-            <h3 className="text-lg font-semibold group-hover:text-primary">
-              {word.word}
-            </h3>
-            <span className="text-sm text-muted-foreground">
-              票数 {word.votes_count}
-            </span>
-          </div>
+        <div className="flex-1 space-y-2">
+          <Link
+            href={`/word/${word.id}`}
+            className="block text-lg font-semibold hover:text-primary"
+          >
+            {word.word}
+          </Link>
           <p className="line-clamp-2 text-sm text-muted-foreground">
             {word.definition}
           </p>
@@ -38,8 +41,19 @@ export function WordCard({ word, variant = "newest", rank }: WordCardProps) {
               {word.example_sentence}
             </p>
           )}
+
+          <div className="flex flex-wrap items-center gap-3 pt-2">
+            <VoteButton
+              wordId={word.id}
+              initialCount={votesCount}
+              onSuccess={setVotesCount}
+            />
+            <ReactionBar wordId={word.id} />
+            <ShareButton wordId={word.id} word={word.word} />
+            <ReportFlag wordId={word.id} />
+          </div>
         </div>
       </div>
-    </Link>
+    </div>
   );
 }
