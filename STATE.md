@@ -1,7 +1,7 @@
 # DicTopia Implementation State
 
 ## 現在のIssue
-Issue 4-2: ホームページ（HeroTopicCard, Leaderboard, NewestList）
+Issue 4-3: SubmissionModal
 
 ## 完了Issue
 - [x] Phase 1: 基盤・DBセットアップ（Issue 1-1〜1-3）
@@ -9,11 +9,14 @@ Issue 4-2: ホームページ（HeroTopicCard, Leaderboard, NewestList）
 - [x] Phase 3: 動的Edge OGP（Issue 3-1）
 - [x] Issue 4-1: 共通レイアウト・Navbar・ダークテーマ
 - [x] Issue 4-2: ホームページ
+- [x] Issue 4-3: SubmissionModal
 
 ## 進行中Issueの状況
-- `app/page.tsx` をサーバーコンポーネント化し、Supabase からお題・トップ10・新着を取得
-- `components/home/hero-topic-card.tsx` `leaderboard.tsx` `newest-list.tsx` を作成
-- `components/word/word-card.tsx` を作成（4-4 でも使用）
+- `components/submission/submission-modal.tsx` を追加
+  - react-hook-form + zod バリデーション
+  - 造語 30 文字 / 意味 200 文字のリアルタイム文字数カウンター
+  - POST /api/words 呼び出し・成功時コールバック
+- `components/layout/navbar.tsx` を client 化し、モーダル開閉を接続
 - `npx tsc --noEmit` 成功
 - `npm run build` 成功
 
@@ -22,4 +25,4 @@ Issue 4-2: ホームページ（HeroTopicCard, Leaderboard, NewestList）
 
 ## 次回の着手事項
 - PR 作成後、人間の承認を待つ
-- Issue 4-3（SubmissionModal）に進む
+- Issue 4-4（WordCard関連：VoteButton, ReactionBar, ShareButton, ReportFlag）に進む
