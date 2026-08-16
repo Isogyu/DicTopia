@@ -1,7 +1,7 @@
 # DicTopia Implementation State
 
 ## 現在のIssue
-Issue 4-5: `/word/[id]` 造語個別ページ、メタデータ、 JSON-LD
+Issue 4-6: Hall of Fame
 
 ## 完了Issue
 - [x] Phase 1: 基盤・DBセットアップ（Issue 1-1〜1-3）
@@ -12,20 +12,19 @@ Issue 4-5: `/word/[id]` 造語個別ページ、メタデータ、 JSON-LD
 - [x] Issue 4-3: SubmissionModal
 - [x] Issue 4-4: WordCard関連
 - [x] Issue 4-5: `/word/[id]` 造語個別ページ
+- [x] Issue 4-6: Hall of Fame
 
 ## 進行中Issueの状況
-- `app/word/[id]/page.tsx` を追加
-  - サーバーコンポーネントで `generateMetadata` 生成
-  - OGP 画像 URL (`/api/og/word/[id]`) 設定
-  - JSON-LD (`schema.org/DefinedTerm`) 出力
-  - `notFound()` による 404 処理
-- `components/word/word-card.tsx` の `detail` バリエーション対応
+- `app/hall-of-fame/page.tsx` を追加
+  - 公開済みの `words` と `topics` を取得
+  - `topic.week_code` ごとに `votes_count` 上位 10 件を表示
 - `npx tsc --noEmit` 成功
 - `npm run build` 成功
 
 ## 直近の失敗と原因
-- なし
+- `Word` 型に `week_code` がないことが判明
+  → `topic.week_code` から取得し、週ごとにグループ化するよう修正
 
 ## 次回の着手事項
 - PR 作成後、人間の承認を待つ
-- Issue 4-6（Hall of Fame）に進む
+- Phase 4 全完了の報告・Phase 5 進行確認
