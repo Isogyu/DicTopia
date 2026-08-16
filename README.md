@@ -1,36 +1,23 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# DicTopia（ディクトピア）
 
-## Getting Started
+UGC造語・ミーム辞書プラットフォーム。ユーザーが新語を発明し、意味を定義し、週替わりのお題で投票・シェアできるサービス。
 
-First, run the development server:
+## ドキュメント
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+実装は以下のドキュメントに従って進めています。
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+- `DicTopia_Devin実行プロンプト_ループエンジニアリング版.md` — 開発の進め方（Phase/Issue/Loop、Human Gate運用）を定義する最上位の指示書。最初に読むこと。
+- `DicTopia_仕様書.md` — 機能要件・DB論理設計・API一覧
+- `DicTopia_詳細設計書.md` — ディレクトリ構成・型定義・シーケンス設計・エラー方針
+- `DicTopia_テスト計画書.md` — 単体/結合/E2Eテスト方針
+- `DicTopia_Supabaseセットアップ手順書.md` — Supabaseのセットアップ手順（マイグレーションSQLの正典）
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 開発ルール
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+- 1 Issue = 1 feature branch = 1 PR
+- PRは人間の承認を経てからマージする（AIによる自己判断でのマージは行わない）
+- 進捗は `STATE.md` に記録する
 
-## Learn More
+## 技術スタック
 
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+Next.js 14+ (App Router, TypeScript) / Tailwind CSS + shadcn/ui / Supabase (PostgreSQL, RLS) / OpenAI API / Vercel
