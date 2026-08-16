@@ -116,6 +116,19 @@ BEGIN
 END;
 $$;
 
+-- スキーマ使用権限を各ロールに付与
+GRANT USAGE ON SCHEMA public TO anon, authenticated, service_role;
+
+-- 公開読み取り権限（アプリの Server/Client Components 用）
+GRANT SELECT ON public.words TO anon, authenticated;
+GRANT SELECT ON public.topics TO anon, authenticated;
+
+-- 公開書き込み権限（認証不要で投稿・投票・リアクション・通報を受け付ける）
+GRANT INSERT ON public.words TO anon, authenticated;
+GRANT INSERT ON public.votes TO anon, authenticated;
+GRANT INSERT ON public.reactions TO anon, authenticated;
+GRANT INSERT ON public.reports TO anon, authenticated;
+
 -- サービスロール（Route Handler 用）にもテーブル操作権限を付与
 GRANT SELECT, INSERT, UPDATE, DELETE ON public.words TO service_role;
 GRANT SELECT, INSERT, UPDATE, DELETE ON public.votes TO service_role;
