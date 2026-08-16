@@ -1,25 +1,25 @@
 # DicTopia Implementation State
 
 ## 現在のIssue
-Issue 2-4: POST /api/words/[id]/report
+Issue 3-1: GET /api/og/word/[id]
 
 ## 完了Issue
-- [x] Issue 1-1: Next.js初期化
-- [x] Issue 1-2: Supabaseローカル環境構築・マイグレーション適用
-- [x] Issue 1-3: Supabaseクライアント実装・型定義
-- [x] Issue 2-1: POST /api/words
-- [x] Issue 2-2: POST /api/words/[id]/vote
-- [x] Issue 2-3: POST /api/words/[id]/react
+- [x] Phase 1: 基盤・DBセットアップ（Issue 1-1〜1-3）
+- [x] Phase 2: コアAPIルート・モデレーション（Issue 2-1〜2-4）
+- [x] Issue 3-1: GET /api/og/word/[id]
 
 ## 進行中Issueの状況
-- 通報API実装: 完了
+- Edge Runtime OGP画像生成: 完了
+- 1200x630 PNG / ダーク背景 / 太字タイポ
+- 存在しない・非公開ID はフォールバック画像
+- `Cache-Control: public, max-age=60, s-maxage=3600` 付与
 - `npx tsc --noEmit` 成功
 - `npm run build` 成功
 
 ## 直近の失敗と原因
-- `increment_reports_count` RPC の戻り値の型が推論されず、TypeScript エラー
-  → `as { auto_unpublished: boolean }` でアサーションし解決
+- `@vercel/og` の `ImageResponse` フォント型と `String.matchAll` イテレータで TypeScript エラー
+  → `FontData.style` から `oblique` を削除、フォントCSSは `RegExp#exec` でパース
 
 ## 次回の着手事項
 - PR 作成後、人間の承認を待つ
-- Phase 2 完了後、Phase 3（動的Edge OGP）に進む
+- Phase 3 完了後、Phase 4（フロントエンド）に進む
