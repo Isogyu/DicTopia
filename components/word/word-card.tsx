@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { cn } from "@/lib/utils";
 import { VoteButton } from "./vote-button";
 import { ReactionBar } from "./reaction-bar";
 import { ShareButton } from "./share-button";
@@ -16,7 +17,19 @@ interface WordCardProps {
 
 export function WordCard({ word, variant = "newest", rank }: WordCardProps) {
   const isLeaderboard = variant === "leaderboard";
+  const isDetail = variant === "detail";
   const [votesCount, setVotesCount] = useState(word.votes_count);
+
+  const title = isDetail ? (
+    <h1 className="text-2xl font-bold">{word.word}</h1>
+  ) : (
+    <Link
+      href={`/word/${word.id}`}
+      className="block text-lg font-semibold hover:text-primary"
+    >
+      {word.word}
+    </Link>
+  );
 
   return (
     <div className="rounded-lg border border-border bg-card p-4 text-card-foreground shadow-sm transition-colors hover:border-primary/50">
@@ -26,18 +39,23 @@ export function WordCard({ word, variant = "newest", rank }: WordCardProps) {
             {rank}
           </span>
         )}
-        <div className="flex-1 space-y-2">
-          <Link
-            href={`/word/${word.id}`}
-            className="block text-lg font-semibold hover:text-primary"
+        <div className="flex-1 space-y-3">
+          {title}
+          <p
+            className={cn(
+              "text-sm text-muted-foreground",
+              !isDetail && "line-clamp-2"
+            )}
           >
-            {word.word}
-          </Link>
-          <p className="line-clamp-2 text-sm text-muted-foreground">
             {word.definition}
           </p>
           {word.example_sentence && (
-            <p className="line-clamp-1 text-xs text-muted-foreground/80">
+            <p
+              className={cn(
+                "text-xs text-muted-foreground/80",
+                !isDetail && "line-clamp-1"
+              )}
+            >
               {word.example_sentence}
             </p>
           )}
