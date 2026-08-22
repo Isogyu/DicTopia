@@ -21,3 +21,11 @@ export function generateReporterHash(
 ): string {
   return generateVoterHash(ip, userAgent, date);
 }
+
+export function generateCommenterHash(
+  ip: string,
+  userAgent: string,
+  date = getJstToday()
+): string {
+  return generateVoterHash(ip, userAgent, date);
+}
