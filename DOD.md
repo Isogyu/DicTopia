@@ -25,6 +25,14 @@
 | Phase 6 | HeroTopicCard（カウントダウンタイマー / クイック投稿欄） | ✅ |
 | Phase 6 | `POST /api/words` 結合テスト 7 ケース | ✅ |
 | Phase 6 | SubmissionModal（Navbar + HeroTopicCard 連携 / `router.refresh`） | ✅ |
+| Phase 7 | フィーチャーフラグ `NEXT_PUBLIC_FEATURE_WEEKLY_TOPIC` 導入 | ✅ |
+| Phase 7 | DB スキーマ拡張（`nickname` / `category` / `comments` / `user_id`） | ✅ |
+| Phase 7 | ライトテーマ移行（`indigo-600` プライマリー） | ✅ |
+| Phase 7 | ホーム刷新（Hero / NewestWords / PopularRanking / RecentComments / BottomCTA） | ✅ |
+| Phase 7 | コメント機能（POST / GET API / CommentList / CommentForm / RecentComments） | ✅ |
+| Phase 7 | SubmissionModal 拡張（nickname / category / 必須カテゴリ） | ✅ |
+| Phase 7 | SearchBar / 検索 API | ✅ |
+| Phase 7 | LoginButton / HamburgerMenu ダミー | ✅ |
 
 ## 検証結果
 
@@ -38,5 +46,5 @@ npx supabase db reset   → success
 
 ## 備考
 
-- すべての Phase / Issue が PR 作成・マージ済。
+- Phase 7 まで全 Issue の実装・PR 作成済。
 - 未解決の既知問題は **STATE.md** に記載していない = なし。
