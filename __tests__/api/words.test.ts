@@ -44,6 +44,7 @@ beforeAll(async () => {
 afterEach(async () => {
   server.resetHandlers();
   await admin.from("words").delete().ilike("word", "test-%");
+  await admin.from("comments").delete().ilike("body", "test-%");
 });
 
 afterAll(() => server.close());
@@ -59,6 +60,7 @@ async function makeRequest(body: Record<string, unknown>) {
 }
 
 async function cleanupWord(id: string) {
+  await admin.from("comments").delete().eq("word_id", id);
   await admin.from("words").delete().eq("id", id);
 }
 
@@ -67,6 +69,7 @@ describe("POST /api/words", () => {
     const res = await makeRequest({
       word: `test-${randomUUID().slice(0, 8)}`,
       definition: "テスト用の造語です",
+      category: "その他",
       topic_id: topicId,
     });
 
@@ -74,7 +77,7 @@ describe("POST /api/words", () => {
     const body = (await res.json()) as { success: boolean; data: Word };
     expect(body.success).toBe(true);
     expect(body.data.is_published).toBe(true);
-    expect(body.data.topic_id).toBe(topicId);
+    expect(body.data.category).toBe("その他");
 
     // 非同期エンリッチメントを待機
     await new Promise((resolve) => setTimeout(resolve, 500));
@@ -104,6 +107,7 @@ describe("POST /api/words", () => {
     const res = await makeRequest({
       word: `test-${randomUUID().slice(0, 8)}`,
       definition: "不適切な定義です",
+      category: "その他",
     });
 
     expect(res.status).toBe(422);
@@ -115,6 +119,7 @@ describe("POST /api/words", () => {
     const res = await makeRequest({
       word: "a".repeat(31),
       definition: "定義です",
+      category: "その他",
     });
 
     expect(res.status).toBe(400);
@@ -124,6 +129,7 @@ describe("POST /api/words", () => {
     const res = await makeRequest({
       word: `test-${randomUUID().slice(0, 8)}`,
       definition: "あ".repeat(201),
+      category: "その他",
     });
 
     expect(res.status).toBe(400);
@@ -133,6 +139,7 @@ describe("POST /api/words", () => {
     const res = await makeRequest({
       word: `test-${randomUUID().slice(0, 8)}`,
       definition: "テスト",
+      category: "その他",
       topic_id: randomUUID(),
     });
 
@@ -151,6 +158,7 @@ describe("POST /api/words", () => {
     const res = await makeRequest({
       word: `test-${randomUUID().slice(0, 8)}`,
       definition: "SEO失敗を確認する造語です",
+      category: "その他",
     });
 
     expect(res.status).toBe(201);
@@ -169,6 +177,7 @@ describe("POST /api/words", () => {
     const res = await makeRequest({
       word: `test-${randomUUID().slice(0, 8)}`,
       definition: "モデレーション失敗を確認する造語です",
+      category: "その他",
     });
 
     expect(res.status).toBe(500);
