@@ -2,7 +2,9 @@ import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
 import { WordCard } from "@/components/word/word-card";
-import type { Word } from "@/types/database";
+import { CommentList } from "@/components/comments/comment-list";
+import { CommentForm } from "@/components/comments/comment-form";
+import type { Word, Comment } from "@/types/database";
 
 export const dynamic = "force-dynamic";
 
@@ -67,11 +69,18 @@ export default async function WordPage({
     .eq("id", params.id)
     .maybeSingle();
 
+  const { data: comments } = await supabase
+    .from("comments")
+    .select("*")
+    .eq("word_id", params.id)
+    .order("created_at", { ascending: false });
+
   if (!word) {
     notFound();
   }
 
   const w = word as Word;
+  const c = (comments as Comment[]) ?? [];
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
 
   const jsonLd = {
@@ -98,6 +107,14 @@ export default async function WordPage({
           <p className="text-sm">{w.ai_search_summary}</p>
         </section>
       )}
+
+      <section className="mt-8 rounded-lg border border-border bg-card p-4">
+        <h2 className="mb-4 text-lg font-bold">コメント</h2>
+        <CommentList comments={c} />
+        <div className="mt-6 border-t border-border pt-6">
+          <CommentForm wordId={w.id} />
+        </div>
+      </section>
 
       <script
         type="application/ld+json"
