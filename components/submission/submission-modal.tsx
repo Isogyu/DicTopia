@@ -5,6 +5,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
 import { createWordSchema, type CreateWordInput } from "@/lib/validation";
+import { FEATURE_WEEKLY_TOPIC } from "@/lib/config";
 import type { Topic, Word } from "@/types/database";
 import type { CreateWordResponse } from "@/types/api";
 
@@ -29,7 +30,7 @@ export function SubmissionModal({
     word: initialWord,
     definition: "",
     example_sentence: "",
-    topic_id: activeTopic?.id,
+    topic_id: FEATURE_WEEKLY_TOPIC ? activeTopic?.id : undefined,
   };
 
   const {
@@ -49,7 +50,7 @@ export function SubmissionModal({
         word: initialWord,
         definition: "",
         example_sentence: "",
-        topic_id: activeTopic?.id,
+        topic_id: FEATURE_WEEKLY_TOPIC ? activeTopic?.id : undefined,
       });
       setServerError(null);
     }
@@ -119,7 +120,7 @@ export function SubmissionModal({
           </button>
         </div>
 
-        {activeTopic && (
+        {FEATURE_WEEKLY_TOPIC && activeTopic && (
           <p className="mb-4 text-sm text-muted-foreground">
             お題：{activeTopic.title}
           </p>
