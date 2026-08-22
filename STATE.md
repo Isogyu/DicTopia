@@ -1,15 +1,15 @@
 # DicTopia Implementation State
 
 ## 現在のIssue
-Issue 6-5: SubmissionModal 実装（Navbar + HeroTopicCard クイック投稿欄連携）
+Issue 6-6: Phase 6 結合確認・E2E 実行
 
 ## Phase 6 バックログ
 - [x] Issue 6-1: HTTPS/HSTS 対応
 - [x] Issue 6-2: ホーム画面: Leaderboard/NewestList 分離・拡張
 - [x] Issue 6-3: ホーム画面: HeroTopicCard 実装
 - [x] Issue 6-4: POST /api/words 実装
-- [ ] Issue 6-5: SubmissionModal 実装（Navbar + HeroTopicCard クイック投稿欄連携）
-- [ ] Issue 6-6: Phase 6 結合確認・E2E 実行
+- [x] Issue 6-5: SubmissionModal 実装（Navbar + HeroTopicCard クイック投稿欄連携）
+- [x] Issue 6-6: Phase 6 結合確認・E2E 実行
 
 ## 過去の完了Issue
 - [x] Phase 1: 基盤・DBセットアップ（Issue 1-1〜1-3）
@@ -27,9 +27,13 @@ Issue 6-5: SubmissionModal 実装（Navbar + HeroTopicCard クイック投稿欄
 - [x] Issue 5-4: 最終 DoD 確認
 
 ## 進行中Issueの状況
-- `components/layout/navbar.tsx` の「造語を作る」ボタンと `SubmissionModal` 連携を整備
-- `components/home/hero-topic-card.tsx` の `QuickSubmitInput` から `SubmissionModal` 起動を整備
-- 投稿成功時に `router.refresh()` して `NewestList` を更新
+- Phase 6 最終検証を全て成功
+  - `npx tsc --noEmit` 成功
+  - `npm run build` 成功
+  - `npx vitest run` 成功
+  - `npm run e2e` 成功
+  - `npx supabase db reset` 成功
+- `DOD.md` を更新し Phase 6 完了を記録
 - 既知の未解決問題：なし
 
 ## 備考

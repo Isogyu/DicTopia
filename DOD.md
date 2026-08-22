@@ -1,6 +1,6 @@
 # DicTopia Definition of Done
 
-最終更新: 2026-08-17
+最終更新: 2026-08-22
 
 ## 実装完了項目
 
@@ -20,6 +20,11 @@
 | Phase 5 | シードデータ（お題 2 件 / 造語 20 件） | ✅ |
 | Phase 5 | 結合テスト（Vitest + MSW） | ✅ |
 | Phase 5 | E2E テスト（Playwright / E2E-1, 2, 4, 9 相当） | ✅ |
+| Phase 6 | HTTPS/HSTS 対応（`next.config.mjs` / 絶対URL `https://` 統一） | ✅ |
+| Phase 6 | ホーム画面 2 カラムレイアウト（Leaderboard / NewestList 分離） | ✅ |
+| Phase 6 | HeroTopicCard（カウントダウンタイマー / クイック投稿欄） | ✅ |
+| Phase 6 | `POST /api/words` 結合テスト 7 ケース | ✅ |
+| Phase 6 | SubmissionModal（Navbar + HeroTopicCard 連携 / `router.refresh`） | ✅ |
 
 ## 検証結果
 
