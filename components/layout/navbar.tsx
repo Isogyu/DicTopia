@@ -1,12 +1,14 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { createClient } from "@/lib/supabase/client";
 import { SubmissionModal } from "@/components/submission/submission-modal";
 import type { Topic } from "@/types/database";
 
 export function Navbar() {
+  const router = useRouter();
   const [open, setOpen] = useState(false);
   const [activeTopic, setActiveTopic] = useState<Topic | null>(null);
 
@@ -24,6 +26,11 @@ export function Navbar() {
       });
   }, []);
 
+  const handleSubmitted = () => {
+    setOpen(false);
+    router.refresh();
+  };
+
   return (
     <>
       <header className="sticky top-0 z-40 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -40,7 +47,7 @@ export function Navbar() {
         activeTopic={activeTopic}
         open={open}
         onOpenChange={setOpen}
-        onSubmitted={() => setOpen(false)}
+        onSubmitted={handleSubmitted}
       />
     </>
   );

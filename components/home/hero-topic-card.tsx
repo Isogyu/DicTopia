@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { CountdownTimer } from "./countdown-timer";
 import { QuickSubmitInput } from "./quick-submit-input";
 import { SubmissionModal } from "@/components/submission/submission-modal";
@@ -12,12 +13,19 @@ interface HeroTopicCardProps {
 }
 
 export function HeroTopicCard({ topic }: HeroTopicCardProps) {
+  const router = useRouter();
   const [open, setOpen] = useState(false);
   const [quickWord, setQuickWord] = useState("");
 
   const handleQuickSubmit = (word: string) => {
     setQuickWord(word);
     setOpen(true);
+  };
+
+  const handleSubmitted = () => {
+    setOpen(false);
+    setQuickWord("");
+    router.refresh();
   };
 
   return (
@@ -60,7 +68,7 @@ export function HeroTopicCard({ topic }: HeroTopicCardProps) {
         activeTopic={topic}
         open={open}
         onOpenChange={setOpen}
-        onSubmitted={() => setOpen(false)}
+        onSubmitted={handleSubmitted}
         initialWord={quickWord}
       />
     </section>
