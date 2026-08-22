@@ -1,10 +1,10 @@
 # DicTopia Implementation State
 
 ## 現在のIssue
-Issue 7-1: フィーチャーフラグ導入
+Issue 7-2: DBスキーマ変更
 
 ## Phase 7 バックログ
-- [ ] Issue 7-1: フィーチャーフラグ導入
+- [x] Issue 7-1: フィーチャーフラグ導入
 - [ ] Issue 7-2: DBスキーマ変更
 - [ ] Issue 7-3: デザインテーマ移行（ライトテーマ化）
 - [ ] Issue 7-4: Hero/NewestWords/PopularRanking 刷新
@@ -23,13 +23,6 @@ Issue 7-1: フィーチャーフラグ導入
 - [x] Issue 6-4: POST /api/words 実装
 - [x] Issue 6-5: SubmissionModal 実装
 - [x] Issue 6-6: Phase 6 結合確認・E2E
-
-## 過去の完了Issue
-- [x] Phase 1: 基盤・DBセットアップ
-- [x] Phase 2: コアAPIルート・モデレーション
-- [x] Phase 3: 動的Edge OGP
-- [x] Issue 4-1〜4-6
-- [x] Issue 5-1〜5-4
 
 ## 備考
 - Phase 7 は v1.2 追加ファイル群に基づくホーム画面刷新・コメント機能追加

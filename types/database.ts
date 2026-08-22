@@ -1,3 +1,11 @@
+export type Category =
+  | "ライフスタイル"
+  | "感情・感性"
+  | "仕事・ビジネス"
+  | "ネット・SNS"
+  | "恋愛・人間関係"
+  | "その他";
+
 export type EmojiType = "fire" | "laugh" | "cry" | "clap";
 
 export interface Topic {
@@ -21,6 +29,11 @@ export interface Word {
   is_published: boolean;
   ai_context_tags: string[];
   ai_search_summary: string | null;
+  nickname: string | null;
+  category: Category;
+  user_id: string | null;
+  comments_count?: number;
+  reactions_count?: number;
 }
 
 export interface Vote {
@@ -43,4 +56,18 @@ export interface Report {
   word_id: string;
   reason: string | null;
   reporter_hash: string;
+}
+
+export interface Comment {
+  id: string;
+  created_at: string;
+  word_id: string;
+  nickname: string | null;
+  body: string;
+  commenter_hash: string;
+  user_id: string | null;
+}
+
+export interface CommentWithWord extends Comment {
+  words: { word: string };
 }
