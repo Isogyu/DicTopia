@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { getCountdownMs, formatCountdown } from "@/lib/week";
 
 export function CountdownTimer() {
-  const [timeLeft, setTimeLeft] = useState(getCountdownMs());
+  const [timeLeft, setTimeLeft] = useState(() => getCountdownMs());
 
   useEffect(() => {
     const id = setInterval(() => {
@@ -15,7 +15,7 @@ export function CountdownTimer() {
   }, []);
 
   return (
-    <div className="text-sm text-muted-foreground">
+    <div className="text-sm text-muted-foreground" suppressHydrationWarning>
       次のお題切り替えまで {formatCountdown(timeLeft)}
     </div>
   );
