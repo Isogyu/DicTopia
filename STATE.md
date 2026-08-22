@@ -1,9 +1,17 @@
 # DicTopia Implementation State
 
 ## 現在のIssue
-Issue 5-4: 最終 DoD 確認
+Issue 6-2: ホーム画面: Leaderboard/NewestList 分離・拡張
 
-## 完了Issue
+## Phase 6 バックログ
+- [x] Issue 6-1: HTTPS/HSTS 対応
+- [ ] Issue 6-2: ホーム画面: Leaderboard/NewestList 分離・拡張
+- [ ] Issue 6-3: ホーム画面: HeroTopicCard 実装
+- [ ] Issue 6-4: POST /api/words 実装
+- [ ] Issue 6-5: SubmissionModal 実装（Navbar + HeroTopicCard クイック投稿欄連携）
+- [ ] Issue 6-6: Phase 6 結合確認・E2E 実行
+
+## 過去の完了Issue
 - [x] Phase 1: 基盤・DBセットアップ（Issue 1-1〜1-3）
 - [x] Phase 2: コアAPIルート・モデレーション（Issue 2-1〜2-4）
 - [x] Phase 3: 動的Edge OGP（Issue 3-1）
@@ -19,18 +27,9 @@ Issue 5-4: 最終 DoD 確認
 - [x] Issue 5-4: 最終 DoD 確認
 
 ## 進行中Issueの状況
-- `DOD.md` を追加し、すべての Phase 完了を記録
-- 最終検証を実施
-  - `npx tsc --noEmit` 成功
-  - `npm run build` 成功
-  - `npx vitest run` 成功
-  - `npm run e2e` 成功
-  - `npx supabase db reset` 成功
+- `app/page.tsx` のホーム画面レイアウトを HeroTopicCard + 2 カラム方式に更新
+- Leaderboard（`votes_count` 降順 Top 10）と NewestList（`created_at` 降順）を分離
 - 既知の未解決問題：なし
 
-## 直近の失敗と原因
-- なし
-
-## 次回の着手事項
-- PR 作成後、人間の承認を待つ
-- プロジェクト完了
+## 備考
+- Phase 6 は v1.1 追加ファイル群に基づくブラッシュアップ
