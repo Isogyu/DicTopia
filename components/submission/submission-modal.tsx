@@ -13,6 +13,7 @@ interface SubmissionModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onSubmitted: (word: Word) => void;
+  initialWord?: string;
 }
 
 export function SubmissionModal({
@@ -20,11 +21,12 @@ export function SubmissionModal({
   open,
   onOpenChange,
   onSubmitted,
+  initialWord = "",
 }: SubmissionModalProps) {
   const [serverError, setServerError] = useState<string | null>(null);
 
   const defaultValues: CreateWordInput = {
-    word: "",
+    word: initialWord,
     definition: "",
     example_sentence: "",
     topic_id: activeTopic?.id,
@@ -44,14 +46,14 @@ export function SubmissionModal({
   useEffect(() => {
     if (open) {
       reset({
-        word: "",
+        word: initialWord,
         definition: "",
         example_sentence: "",
         topic_id: activeTopic?.id,
       });
       setServerError(null);
     }
-  }, [open, activeTopic, reset]);
+  }, [open, activeTopic, initialWord, reset]);
 
   const word = watch("word") ?? "";
   const definition = watch("definition") ?? "";
