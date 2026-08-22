@@ -1,7 +1,7 @@
 # DicTopia Implementation State
 
 ## 現在のIssue
-Issue 6-2: ホーム画面: Leaderboard/NewestList 分離・拡張
+Issue 6-3: ホーム画面: HeroTopicCard 実装
 
 ## Phase 6 バックログ
 - [x] Issue 6-1: HTTPS/HSTS 対応
@@ -27,9 +27,13 @@ Issue 6-2: ホーム画面: Leaderboard/NewestList 分離・拡張
 - [x] Issue 5-4: 最終 DoD 確認
 
 ## 進行中Issueの状況
-- `app/page.tsx` のホーム画面レイアウトを HeroTopicCard + 2 カラム方式に更新
-- Leaderboard（`votes_count` 降順 Top 10）と NewestList（`created_at` 降順）を分離
-- 既知の未解決問題：なし
+- `lib/week.ts` を新規追加（JST 基準の `week_code` 算出、日曜 23:59 までのカウントダウン）
+- `components/home/countdown-timer.tsx` を新規追加
+- `components/home/quick-submit-input.tsx` を新規追加
+- `components/home/hero-topic-card.tsx` を client 化し、CountdownTimer / QuickSubmitInput / SubmissionModal を統合
+- `components/submission/submission-modal.tsx` に `initialWord` プロパティを追加
+- `npx tsc --noEmit` 成功
+- `npm run build` 成功
 
 ## 備考
 - Phase 6 は v1.1 追加ファイル群に基づくブラッシュアップ
