@@ -20,7 +20,7 @@ export default function RootLayout({
   return (
     <html
       lang="ja"
-      className={cn("dark", "font-sans", inter.variable)}
+      className={cn("font-sans", inter.variable)}
       suppressHydrationWarning
     >
       <body
