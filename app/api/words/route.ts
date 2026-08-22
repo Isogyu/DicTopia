@@ -18,7 +18,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: messages }, { status: 400 });
     }
 
-    const { word, definition, example_sentence, topic_id } = parse.data;
+    const { word, definition, example_sentence, topic_id, nickname, category } = parse.data;
 
     const textToModerate = [word, definition, example_sentence]
       .filter((s): s is string => typeof s === "string" && s.length > 0)
@@ -51,6 +51,9 @@ export async function POST(request: NextRequest) {
         example_sentence: example_sentence ?? null,
         topic_id: topic_id ?? null,
         is_published: true,
+        nickname: nickname ?? null,
+        category,
+        user_id: null,
       })
       .select()
       .single();

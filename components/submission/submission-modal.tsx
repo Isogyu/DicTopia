@@ -9,6 +9,15 @@ import { FEATURE_WEEKLY_TOPIC } from "@/lib/config";
 import type { Topic, Word } from "@/types/database";
 import type { CreateWordResponse } from "@/types/api";
 
+const CATEGORIES = [
+  "ライフスタイル",
+  "感情・感性",
+  "仕事・ビジネス",
+  "ネット・SNS",
+  "恋愛・人間関係",
+  "その他",
+];
+
 interface SubmissionModalProps {
   activeTopic: Topic | null;
   open: boolean;
@@ -31,6 +40,8 @@ export function SubmissionModal({
     definition: "",
     example_sentence: "",
     topic_id: FEATURE_WEEKLY_TOPIC ? activeTopic?.id : undefined,
+    nickname: "",
+    category: "ライフスタイル",
   };
 
   const {
@@ -51,6 +62,8 @@ export function SubmissionModal({
         definition: "",
         example_sentence: "",
         topic_id: FEATURE_WEEKLY_TOPIC ? activeTopic?.id : undefined,
+        nickname: "",
+        category: "ライフスタイル",
       });
       setServerError(null);
     }
@@ -59,6 +72,7 @@ export function SubmissionModal({
   const word = watch("word") ?? "";
   const definition = watch("definition") ?? "";
   const example = watch("example_sentence") ?? "";
+  const nickname = watch("nickname") ?? "";
 
   const onSubmit = async (data: CreateWordInput) => {
     setServerError(null);
@@ -191,6 +205,46 @@ export function SubmissionModal({
             <p className="mt-1 text-xs text-muted-foreground">
               {example.length} 文字
             </p>
+          </div>
+
+          <div>
+            <label htmlFor="category" className="mb-1 block text-sm font-medium">
+              カテゴリ
+            </label>
+            <select
+              id="category"
+              className="w-full rounded-lg border border-input bg-background px-3 py-2 text-foreground outline-none ring-offset-background focus-visible:ring-2 focus-visible:ring-ring"
+              aria-invalid={errors.category ? "true" : "false"}
+              {...register("category")}
+            >
+              {CATEGORIES.map((cat) => (
+                <option key={cat} value={cat}>
+                  {cat}
+                </option>
+              ))}
+            </select>
+            <p className="mt-1 text-xs text-muted-foreground">
+              {errors.category?.message}
+            </p>
+          </div>
+
+          <div>
+            <label htmlFor="nickname" className="mb-1 block text-sm font-medium">
+              ニックネーム（任意）
+            </label>
+            <input
+              id="nickname"
+              type="text"
+              maxLength={30}
+              className="w-full rounded-lg border border-input bg-background px-3 py-2 text-foreground outline-none ring-offset-background focus-visible:ring-2 focus-visible:ring-ring"
+              placeholder="名無し"
+              aria-invalid={errors.nickname ? "true" : "false"}
+              {...register("nickname")}
+            />
+            <div className="mt-1 flex items-center justify-between text-xs text-muted-foreground">
+              <span>{errors.nickname?.message}</span>
+              <span>{nickname.length} / 30</span>
+            </div>
           </div>
 
           <Button type="submit" className="w-full" disabled={isSubmitting}>
