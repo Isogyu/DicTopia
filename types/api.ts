@@ -1,4 +1,4 @@
-import { EmojiType, Word } from "./database";
+import { EmojiType, Word, Comment } from "./database";
 
 // POST /api/words
 export interface CreateWordRequest {
@@ -6,6 +6,8 @@ export interface CreateWordRequest {
   definition: string;      // 1〜200文字
   example_sentence?: string;
   topic_id?: string;
+  nickname?: string;
+  category: string;
 }
 export type CreateWordResponse =
   | { success: true; data: Word }
@@ -28,4 +30,13 @@ export interface ReportRequest {
 }
 export type ReportResponse =
   | { success: true; auto_unpublished: boolean }
+  | { success: false; error: string };
+
+// POST /api/words/[id]/comments
+export interface CreateCommentRequest {
+  body: string;
+  nickname?: string;
+}
+export type CreateCommentResponse =
+  | { success: true; data: Comment }
   | { success: false; error: string };
