@@ -1,7 +1,7 @@
 # DicTopia Implementation State
 
 ## 現在のIssue
-Issue 7-7: RecentComments 実装
+Issue 7-8: SubmissionModal 拡張
 
 ## Phase 7 バックログ
 - [x] Issue 7-1: フィーチャーフラグ導入
@@ -10,7 +10,7 @@ Issue 7-7: RecentComments 実装
 - [x] Issue 7-4: Hero/NewestWords/PopularRanking 刷新
 - [x] Issue 7-5: コメントAPI実装
 - [x] Issue 7-6: コメントUI実装
-- [ ] Issue 7-7: RecentComments 実装
+- [x] Issue 7-7: RecentComments 実装
 - [ ] Issue 7-8: SubmissionModal 拡張
 - [ ] Issue 7-9: SearchBar/検索API 実装
 - [ ] Issue 7-10: LoginButton（ダミー）実装

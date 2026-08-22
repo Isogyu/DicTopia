@@ -19,7 +19,7 @@ export const createWordSchema = z.object({
     "ネット・SNS",
     "恋愛・人間関係",
     "その他",
-  ], { message: "カテゴリを選択してください" }).optional(),
+  ], { message: "カテゴリを選択してください" }),
 });
 
 export type CreateWordInput = z.infer<typeof createWordSchema>;
