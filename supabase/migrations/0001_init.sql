@@ -116,7 +116,27 @@ BEGIN
 END;
 $$;
 
--- RPC関数への実行権限を匿名ユーザー・認証済みユーザーの両方に明示的に付与
+-- スキーマ使用権限を各ロールに付与
+GRANT USAGE ON SCHEMA public TO anon, authenticated, service_role;
+
+-- 公開読み取り権限（アプリの Server/Client Components 用）
+GRANT SELECT ON public.words TO anon, authenticated;
+GRANT SELECT ON public.topics TO anon, authenticated;
+
+-- 公開書き込み権限（認証不要で投稿・投票・リアクション・通報を受け付ける）
+GRANT INSERT ON public.words TO anon, authenticated;
+GRANT INSERT ON public.votes TO anon, authenticated;
+GRANT INSERT ON public.reactions TO anon, authenticated;
+GRANT INSERT ON public.reports TO anon, authenticated;
+
+-- サービスロール（Route Handler 用）にもテーブル操作権限を付与
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.words TO service_role;
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.votes TO service_role;
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.reactions TO service_role;
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.reports TO service_role;
+GRANT SELECT ON public.topics TO service_role;
+
+-- RPC関数への実行権限を匿名ユーザー・認証済みユーザー・サービスロールに付与
 -- （投稿・投票・通報は認証不要のため、anonロールへの付与が必須）
-GRANT EXECUTE ON FUNCTION public.increment_votes_count(UUID) TO anon, authenticated;
-GRANT EXECUTE ON FUNCTION public.increment_reports_count(UUID) TO anon, authenticated;
+GRANT EXECUTE ON FUNCTION public.increment_votes_count(UUID) TO anon, authenticated, service_role;
+GRANT EXECUTE ON FUNCTION public.increment_reports_count(UUID) TO anon, authenticated, service_role;
