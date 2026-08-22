@@ -29,7 +29,11 @@ export async function generateMetadata({
   }
 
   const w = word as Word;
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL;
+  if (!siteUrl) {
+    return { title: `${w.word} - DicTopia` };
+  }
+
   const ogImage = `${siteUrl}/api/og/word/${params.id}`;
 
   return {

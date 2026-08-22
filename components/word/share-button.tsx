@@ -9,7 +9,9 @@ interface ShareButtonProps {
 
 export function ShareButton({ wordId, word }: ShareButtonProps) {
   const handleShare = () => {
-    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
+    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL;
+    if (!siteUrl) return;
+
     const url = `${siteUrl}/word/${wordId}`;
     const text = `${word} - DicTopia で作語をシェア`;
 
