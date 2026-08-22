@@ -1,12 +1,12 @@
 # DicTopia Implementation State
 
 ## 現在のIssue
-Issue 6-3: ホーム画面: HeroTopicCard 実装
+Issue 6-4: POST /api/words 実装
 
 ## Phase 6 バックログ
 - [x] Issue 6-1: HTTPS/HSTS 対応
-- [ ] Issue 6-2: ホーム画面: Leaderboard/NewestList 分離・拡張
-- [ ] Issue 6-3: ホーム画面: HeroTopicCard 実装
+- [x] Issue 6-2: ホーム画面: Leaderboard/NewestList 分離・拡張
+- [x] Issue 6-3: ホーム画面: HeroTopicCard 実装
 - [ ] Issue 6-4: POST /api/words 実装
 - [ ] Issue 6-5: SubmissionModal 実装（Navbar + HeroTopicCard クイック投稿欄連携）
 - [ ] Issue 6-6: Phase 6 結合確認・E2E 実行
@@ -27,13 +27,18 @@ Issue 6-3: ホーム画面: HeroTopicCard 実装
 - [x] Issue 5-4: 最終 DoD 確認
 
 ## 進行中Issueの状況
-- `lib/week.ts` を新規追加（JST 基準の `week_code` 算出、日曜 23:59 までのカウントダウン）
-- `components/home/countdown-timer.tsx` を新規追加
-- `components/home/quick-submit-input.tsx` を新規追加
-- `components/home/hero-topic-card.tsx` を client 化し、CountdownTimer / QuickSubmitInput / SubmissionModal を統合
-- `components/submission/submission-modal.tsx` に `initialWord` プロパティを追加
+- `POST /api/words` 実装は既存の `app/api/words/route.ts` を流用
+- 追加テスト計画書 3 章の 7 ケースを `__tests__/api/words.test.ts` に追加
+  - 正常投稿 + SEO エンリッチメント
+  - モデレーション拒否
+  - `word` 31 文字超過
+  - `definition` 201 文字超過
+  - 存在しない `topic_id`
+  - SEO エンリッチメント失敗時も 201
+  - OpenAI Moderation API 障害時 500
 - `npx tsc --noEmit` 成功
 - `npm run build` 成功
+- `npx vitest run __tests__/api/words.test.ts` 成功
 
 ## 備考
 - Phase 6 は v1.1 追加ファイル群に基づくブラッシュアップ
