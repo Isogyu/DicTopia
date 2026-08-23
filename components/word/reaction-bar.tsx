@@ -14,13 +14,15 @@ const EMOJI_MAP: Record<EmojiType, string> = {
 
 interface ReactionBarProps {
   wordId: string;
+  onReacted?: () => void;
 }
 
-export function ReactionBar({ wordId }: ReactionBarProps) {
+export function ReactionBar({ wordId, onReacted }: ReactionBarProps) {
   const [submitting, setSubmitting] = useState<EmojiType | null>(null);
+  const [reacted, setReacted] = useState<EmojiType | null>(null);
 
   const handleReact = async (emoji: EmojiType) => {
-    if (submitting) return;
+    if (submitting || reacted === emoji) return;
 
     setSubmitting(emoji);
 
@@ -32,7 +34,13 @@ export function ReactionBar({ wordId }: ReactionBarProps) {
       });
       const result = (await res.json()) as ReactResponse;
 
-      if (!res.ok || !result.success) {
+      if (res.ok && result.success) {
+        setReacted(emoji);
+        onReacted?.();
+        return;
+      }
+
+      if (!res.ok) {
         alert("error" in result ? result.error : "リアクションに失敗しました");
       }
     } catch {
@@ -49,11 +57,12 @@ export function ReactionBar({ wordId }: ReactionBarProps) {
           key={emoji}
           type="button"
           size="icon"
-          variant="ghost"
+          variant={reacted === emoji ? "default" : "ghost"}
           className="text-xl"
-          disabled={submitting === emoji}
+          disabled={submitting === emoji || Boolean(reacted)}
           onClick={() => handleReact(emoji)}
           aria-label={emoji}
+          title={emoji}
         >
           {EMOJI_MAP[emoji]}
         </Button>

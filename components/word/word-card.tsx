@@ -22,6 +22,7 @@ export function WordCard({ word, variant = "newest", rank }: WordCardProps) {
   const isDetail = variant === "detail";
   const isGrid = variant === "grid";
   const [votesCount, setVotesCount] = useState(word.votes_count);
+  const [reactionsCount, setReactionsCount] = useState(word.reactions_count ?? 0);
 
   const isNew =
     Date.now() - new Date(word.created_at).getTime() < 24 * 60 * 60 * 1000;
@@ -105,17 +106,18 @@ export function WordCard({ word, variant = "newest", rank }: WordCardProps) {
               initialCount={votesCount}
               onSuccess={setVotesCount}
             />
-            <ReactionBar wordId={word.id} />
+            <ReactionBar
+              wordId={word.id}
+              onReacted={() => setReactionsCount((c) => c + 1)}
+            />
             <ShareButton wordId={word.id} word={word.word} />
-            <ReportFlag wordId={word.id} />
+            <ReportFlag wordId={word.id} word={word.word} />
           </div>
 
-          {(word.comments_count || word.reactions_count) && (
-            <div className="flex items-center gap-4 text-xs text-muted-foreground">
-              <span>コメント {word.comments_count ?? 0}</span>
-              <span>リアクション {word.reactions_count ?? 0}</span>
-            </div>
-          )}
+          <div className="flex items-center gap-4 text-xs text-muted-foreground">
+            <span>コメント {word.comments_count ?? 0}</span>
+            <span>リアクション {reactionsCount}</span>
+          </div>
         </div>
       </div>
     </div>
