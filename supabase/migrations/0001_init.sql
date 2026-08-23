@@ -1,4 +1,5 @@
 -- Enable UUID extension
+SET search_path = public, extensions;
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
 -- Topics Table (Weekly Contests)

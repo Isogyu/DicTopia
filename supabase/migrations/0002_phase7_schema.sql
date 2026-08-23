@@ -1,4 +1,5 @@
 -- Phase 7: words 列追加 / comments テーブル新規 / user_id 受け皿
+SET search_path = public, extensions;
 
 -- 1. words テーブル拡張
 ALTER TABLE public.words
