@@ -5,9 +5,12 @@ import type { ReportResponse } from "@/types/api";
 
 interface ReportFlagProps {
   wordId: string;
+  word: string;
 }
 
-export function ReportFlag({ wordId }: ReportFlagProps) {
+export function ReportFlag({ wordId, word }: ReportFlagProps) {
+  const adminEmail = process.env.NEXT_PUBLIC_ADMIN_EMAIL;
+
   const handleReport = async () => {
     const reason = window.prompt("通報の理由を入力してください（任意）");
     if (reason === null) return;
@@ -21,6 +24,18 @@ export function ReportFlag({ wordId }: ReportFlagProps) {
       const result = (await res.json()) as ReportResponse;
 
       if (res.ok && result.success) {
+        const subject = encodeURIComponent(`[DicTopia 通報] ${word}`);
+        const body = encodeURIComponent(
+          `通報対象: ${word}\nURL: ${window.location.origin}/word/${wordId}\n理由: ${reason || "理由なし"}\n\n運営へ連絡してください。`
+        );
+
+        if (adminEmail) {
+          window.open(
+            `mailto:${adminEmail}?subject=${subject}&body=${body}`,
+            "_blank"
+          );
+        }
+
         alert(
           result.auto_unpublished
             ? "通報を受け付けました。非公開にしました。"
