@@ -26,7 +26,8 @@ export type ReactResponse = { success: true } | { success: false; error: string 
 
 // POST /api/words/[id]/report
 export interface ReportRequest {
-  reason?: string;
+  reason: "スパム" | "暴言" | "不適切" | "その他";
+  comment?: string;
 }
 export type ReportResponse =
   | { success: true; auto_unpublished: boolean }
