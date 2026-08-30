@@ -18,6 +18,9 @@ export type VoteResponse =
   | { success: true; votes_count: number }
   | { success: false; error: string }; // 429時: "本日はこの造語にすでに投票済みです"
 
+// GET /api/words/[id]/vote
+export type VoteStatusResponse = { voted: boolean; votes_count: number };
+
 // POST /api/words/[id]/react
 export interface ReactRequest {
   emoji_type: EmojiType;
