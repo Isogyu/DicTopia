@@ -5,7 +5,10 @@ import { generateReporterHash } from "@/lib/hash";
 import type { ReportRequest, ReportResponse } from "@/types/api";
 
 const reportSchema = z.object({
-  reason: z.string().optional(),
+  reason: z.enum(["スパム", "暴言", "不適切", "その他"], {
+    message: "通報理由を選択してください",
+  }),
+  comment: z.string().max(500).optional(),
 });
 
 export async function POST(
@@ -40,7 +43,9 @@ export async function POST(
     );
   }
 
-  const { reason } = parse.data;
+  const { reason, comment } = parse.data;
+  const detail = comment?.trim();
+  const storedReason = detail ? `${reason}: ${detail}` : reason;
 
   const forwarded = request.headers.get("x-forwarded-for");
   const ip = forwarded ? forwarded.split(",")[0].trim() : "unknown";
@@ -51,7 +56,7 @@ export async function POST(
 
   const { error: insertError } = await supabase.from("reports").insert({
     word_id: wordId,
-    reason: reason ?? null,
+    reason: storedReason,
     reporter_hash: reporterHash,
   });
 
