@@ -37,7 +37,7 @@ export function HeroCta() {
         <Button
           size="lg"
           variant="outline"
-          onClick={() => alert("使い方ページは近日公開予定です")}
+          onClick={() => router.push("/coming-soon")}
         >
           使い方を見る
         </Button>
