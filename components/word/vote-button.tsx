@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
-import type { VoteResponse } from "@/types/api";
+import type { VoteResponse, VoteStatusResponse } from "@/types/api";
 
 type VoteStatus = "idle" | "voting" | "voted" | "limited";
 
@@ -16,8 +16,25 @@ export function VoteButton({ wordId, initialCount, onSuccess }: VoteButtonProps)
   const [count, setCount] = useState(initialCount);
   const [status, setStatus] = useState<VoteStatus>("idle");
 
+  useEffect(() => {
+    const checkVote = async () => {
+      try {
+        const res = await fetch(`/api/words/${wordId}/vote`);
+        const result = (await res.json()) as VoteStatusResponse;
+        if (res.ok && result.voted) {
+          setCount(result.votes_count);
+          setStatus("voted");
+        }
+      } catch {
+        // 投票状態の取得に失敗しても操作は可能にする
+      }
+    };
+
+    void checkVote();
+  }, [wordId]);
+
   const handleVote = async () => {
-    if (status === "voting" || status === "limited") return;
+    if (status === "voting" || status === "voted" || status === "limited") return;
 
     setStatus("voting");
 
@@ -43,6 +60,10 @@ export function VoteButton({ wordId, initialCount, onSuccess }: VoteButtonProps)
     }
   };
 
+  const disabled =
+    status === "voting" || status === "voted" || status === "limited";
+  const label = status === "voted" ? "投票済み" : "▲ 投票";
+
   return (
     <div className="flex flex-col gap-1">
       <div className="relative inline-flex items-center gap-2">
@@ -51,10 +72,10 @@ export function VoteButton({ wordId, initialCount, onSuccess }: VoteButtonProps)
           size="sm"
           variant="outline"
           onClick={handleVote}
-          disabled={status === "voting" || status === "limited"}
+          disabled={disabled}
           aria-label="投票する"
         >
-          ▲ 投票 {count}
+          {label} {count}
         </Button>
       </div>
       {status === "limited" && (
