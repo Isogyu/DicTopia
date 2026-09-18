@@ -15,16 +15,20 @@ DicTopia は、ユーザーが自分だけの新語（造語）を投稿し、�
 
 主な機能：
 
-- 造語の投稿・表示
-- お題に沿った週次コンテスト（機能フラグで無効化可能）
+- 造語の投稿・表示（ログイン不要）
+- 造語一覧 `/words` とカテゴリ別一覧 `/words/[category]`（新着順 / 人気順・ページング）
+- 検索（ヘッダーのサジェスト + 検索結果ページ `/search`）
 - 匿名投票（1 日 1 回制限）
-- リアクション（絵文字）
+- リアクション（絵文字・同日同絵文字は 1 回）
 - コメント
-- 通報
-- Hall of Fame
-- OpenAI モデレーション（一時的にスキップ可能）
-- 動的 OGP 画像生成
-- 検索
+- 通報（3 件で自動非公開）
+- 殿堂入り `/hall-of-fame`
+- 使い方・ガイドライン `/about`
+- お題に沿った週次コンテスト（機能フラグで無効化可能）
+- OpenAI モデレーション
+- 動的 OGP 画像生成（造語ごと / サイト共通）
+- SEO 基盤：`sitemap.xml`・`robots.txt`・構造化データ（WebSite / DefinedTerm / BreadcrumbList / FAQPage）
+- 書き込み系 API のレートリミット
 
 ## 開発アプローチ
 
@@ -83,8 +87,10 @@ cp .env.local.example .env.local
 - `OPENAI_API_KEY`
 - `NEXT_PUBLIC_SITE_URL`
 - `NEXT_PUBLIC_FEATURE_WEEKLY_TOPIC`
-- `SKIP_MODERATION`
-- `NEXT_PUBLIC_ADMIN_EMAIL`
+- `SKIP_MODERATION`（本番では必ず `false`。`true` にすると投稿が無検査で公開されます）
+- `DISABLE_RATE_LIMIT`（ローカル検証用。本番では設定しないでください）
+
+> `NEXT_PUBLIC_ADMIN_EMAIL` は廃止しました。通報はサーバー側の `reports` テーブルに記録されます。
 
 ### 3. ローカル Supabase の起動
 
@@ -156,6 +162,16 @@ npm run build
 - `DicTopia_詳細設計書.md` — ディレクトリ構成・型定義・シーケンス設計
 - `DicTopia_テスト計画書.md` — 単体/結合/E2E テスト方針
 - `DicTopia_Supabaseセットアップ手順書.md` — Supabase セットアップ手順
+
+## アーキテクチャ上の約束ごと
+
+- **読み取りは `lib/supabase/public.ts`（anon + RLS）**を使う。`lib/supabase/server.ts` は `cookies()` を参照するため、使った時点でそのページは動的レンダリングに落ちて ISR が効かなくなる。
+- **Service Role（`lib/supabase/admin.ts`）は書き込み系 Route Handler 専用。** クライアントコンポーネントから絶対に import しない。
+- **一覧・検索のクエリは `lib/words.ts` に集約する。** ページごとに `select` を書くと、カウントの取り方がずれる。
+- **PostgREST の `or()` にユーザー入力を直接埋め込まない。** 必ず `lib/supabase/filters.ts` の `sanitizeSearchTerm` / `ilikeFilter` を通す（フィルタインジェクション対策）。
+- **書き込み系 API には `lib/rate-limit.ts` を通す。** とくに OpenAI を呼ぶエンドポイントは課金に直結する。
+- **カテゴリの定義は `lib/categories.ts` が唯一の情報源。** zod スキーマ・UI・URL スラッグはここから導出する。
+- レートリミットは現状プロセス内メモリ。厳密な分散制御が必要になったら `lib/rate-limit.ts` の実装だけを Upstash Redis / Vercel KV に差し替える。
 
 ## 開発ルール
 

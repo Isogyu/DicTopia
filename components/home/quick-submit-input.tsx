@@ -11,26 +11,34 @@ export function QuickSubmitInput({ onSubmit }: QuickSubmitInputProps) {
   const [word, setWord] = useState("");
 
   const handleSubmit = () => {
-    if (word.trim().length === 0) return;
-    onSubmit(word.trim().slice(0, 30));
+    const trimmed = word.trim();
+    if (trimmed.length === 0) return;
+    onSubmit(trimmed.slice(0, 30));
     setWord("");
   };
 
   return (
-    <div className="flex w-full max-w-md items-center gap-2">
+    <form
+      className="flex w-full max-w-md flex-col gap-2 sm:flex-row"
+      onSubmit={(e) => {
+        e.preventDefault();
+        handleSubmit();
+      }}
+    >
+      <label htmlFor="quick-word" className="sr-only">
+        新しい造語
+      </label>
       <input
+        id="quick-word"
         type="text"
         value={word}
         onChange={(e) => setWord(e.target.value.slice(0, 30))}
-        onKeyDown={(e) => {
-          if (e.key === "Enter") handleSubmit();
-        }}
         placeholder="新しい造語を入力（30文字以内）"
-        className="w-full rounded-lg border border-input bg-background px-3 py-2 text-foreground outline-none ring-offset-background focus-visible:ring-2 focus-visible:ring-ring"
+        className="h-12 w-full rounded-xl border border-input bg-background px-4 text-base outline-none ring-offset-background focus-visible:ring-2 focus-visible:ring-ring"
       />
-      <Button type="button" onClick={handleSubmit} aria-label="投稿する">
-        投稿
+      <Button type="submit" size="lg" className="h-12 shrink-0 px-6 text-base">
+        投稿する
       </Button>
-    </div>
+    </form>
   );
 }

@@ -2,7 +2,13 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { generateReporterHash } from "@/lib/hash";
-import type { ReportRequest, ReportResponse } from "@/types/api";
+import { clientKey, rateLimit, retryAfterHeaders } from "@/lib/rate-limit";
+import { safeRevalidate } from "@/lib/revalidate";
+import type { ReportResponse } from "@/types/api";
+
+/** 通報は 3 件で自動非公開になるため、集中的な悪用を防ぐ上限を設ける */
+const RATE_LIMIT = 10;
+const RATE_WINDOW_MS = 60_000;
 
 const reportSchema = z.object({
   reason: z.enum(["スパム", "暴言", "不適切", "その他"], {
@@ -24,6 +30,21 @@ export async function POST(
   }
 
   const wordId = params.id;
+
+  const limit = rateLimit(
+    clientKey(request, "reports:create"),
+    RATE_LIMIT,
+    RATE_WINDOW_MS
+  );
+  if (!limit.ok) {
+    return NextResponse.json(
+      {
+        success: false,
+        error: "短時間に通報しすぎています。少し時間をおいてお試しください",
+      } as ReportResponse,
+      { status: 429, headers: retryAfterHeaders(limit) }
+    );
+  }
 
   let body: unknown;
   try {
@@ -87,6 +108,11 @@ export async function POST(
   }
 
   const autoUnpublished = (data as { auto_unpublished: boolean }).auto_unpublished;
+
+  if (autoUnpublished) {
+    // 非公開になった造語をキャッシュから落とす
+    safeRevalidate(`/word/${wordId}`, "/", "/words");
+  }
 
   return NextResponse.json(
     { success: true, auto_unpublished: autoUnpublished } as ReportResponse,

@@ -1,36 +1,67 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
+import { Share2 } from "lucide-react";
+import { useToast } from "@/components/ui/toast";
+import { buildShareText, buildShareUrl, buildTweetIntent } from "@/lib/share";
 
 interface ShareButtonProps {
   wordId: string;
   word: string;
+  definition: string;
+  /** 詳細ページなど、文言を出したい場所で true */
+  withLabel?: boolean;
 }
 
-export function ShareButton({ wordId, word }: ShareButtonProps) {
-  const handleShare = () => {
-    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL;
-    if (!siteUrl) return;
+export function ShareButton({
+  wordId,
+  word,
+  definition,
+  withLabel = false,
+}: ShareButtonProps) {
+  const { toast } = useToast();
+  const target = { id: wordId, word, definition };
 
-    const url = `${siteUrl}/word/${wordId}`;
-    const text = `${word} - DicTopia で作語をシェア`;
+  const handleShare = async () => {
+    // モバイルではネイティブ共有シート、非対応環境では X の投稿画面へ
+    if (typeof navigator !== "undefined" && navigator.share) {
+      try {
+        await navigator.share({
+          title: `${word} - DicTopia`,
+          text: buildShareText(target),
+          url: buildShareUrl(target),
+        });
+        return;
+      } catch {
+        // キャンセル時は何もしない
+        return;
+      }
+    }
 
-    const shareUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(
-      text
-    )}&url=${encodeURIComponent(url)}&hashtags=DicTopia`;
+    const opened = window.open(
+      buildTweetIntent(target),
+      "_blank",
+      "noopener,noreferrer"
+    );
 
-    window.open(shareUrl, "_blank", "noopener,noreferrer");
+    if (!opened) {
+      try {
+        await navigator.clipboard.writeText(buildShareUrl(target));
+        toast("リンクをコピーしました");
+      } catch {
+        toast("シェアできませんでした", "error");
+      }
+    }
   };
 
   return (
-    <Button
+    <button
       type="button"
-      size="sm"
-      variant="ghost"
       onClick={handleShare}
-      aria-label="Xでシェア"
+      aria-label={`「${word}」をシェアする`}
+      className="inline-flex h-11 items-center justify-center gap-1.5 rounded-full px-3 text-sm text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
     >
-      X でシェア
-    </Button>
+      <Share2 className="h-4 w-4" aria-hidden="true" />
+      {withLabel && <span>シェア</span>}
+    </button>
   );
 }
