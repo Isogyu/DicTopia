@@ -5,16 +5,16 @@ test.describe("通報 UX", () => {
     page,
   }) => {
     await page.goto("/");
-    await page.getByText("サブスク墓場").first().click();
+    await page.getByRole("link", { name: "サブスク墓場" }).first().click();
     await expect(page).toHaveURL(/\/word\//);
 
     const reportButton = page
-      .getByRole("button", { name: "通報する" })
+      .getByRole("button", { name: /を通報する$/ })
       .first();
     await expect(reportButton).toBeVisible();
     await reportButton.click();
 
-    const dialog = page.getByRole("dialog", { name: "通報" });
+    const dialog = page.getByRole("dialog", { name: "通報する" });
     await expect(dialog).toBeVisible();
 
     for (const reason of ["スパム", "暴言", "不適切", "その他"]) {
@@ -23,5 +23,17 @@ test.describe("通報 UX", () => {
 
     await dialog.getByLabel("その他").check();
     await expect(dialog.getByLabel("詳細（任意）")).toBeVisible();
+  });
+
+  test("Escape キーでモーダルを閉じられる", async ({ page }) => {
+    await page.goto("/");
+    await page.getByRole("link", { name: "サブスク墓場" }).first().click();
+    await page.getByRole("button", { name: /を通報する$/ }).first().click();
+
+    const dialog = page.getByRole("dialog", { name: "通報する" });
+    await expect(dialog).toBeVisible();
+
+    await page.keyboard.press("Escape");
+    await expect(dialog).toBeHidden();
   });
 });

@@ -1,6 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createAdminClient } from "@/lib/supabase/admin";
-import type { Word } from "@/types/database";
+import { searchWords } from "@/lib/words";
+
+export const dynamic = "force-dynamic";
+
+const DEFAULT_LIMIT = 20;
+const MAX_LIMIT = 50;
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
@@ -10,19 +14,35 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: "検索語を入力してください" }, { status: 400 });
   }
 
-  const supabase = createAdminClient();
+  const requested = Number(searchParams.get("limit"));
+  const limit =
+    Number.isFinite(requested) && requested > 0
+      ? Math.min(Math.floor(requested), MAX_LIMIT)
+      : DEFAULT_LIMIT;
 
-  const { data, error } = await supabase
-    .from("words")
-    .select("*")
-    .eq("is_published", true)
-    .or(`word.ilike.%${q}%,definition.ilike.%${q}%`)
-    .order("votes_count", { ascending: false })
-    .limit(20);
+  try {
+    // 検索語のサニタイズは searchWords 内で行う。
+    // 以前はユーザー入力を or() のフィルタ式へ直接埋め込んでいたため、
+    // カンマ 1 文字でクエリが壊れ、任意のフィルタも注入できる状態だった。
+    const { words, empty } = await searchWords(q, { limit });
 
-  if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    if (empty) {
+      return NextResponse.json({ words: [] });
+    }
+
+    return NextResponse.json(
+      { words },
+      {
+        headers: {
+          // サジェストは同一クエリの連打が多いので短時間だけ CDN キャッシュ
+          "Cache-Control": "public, max-age=30, s-maxage=60",
+        },
+      }
+    );
+  } catch {
+    return NextResponse.json(
+      { error: "検索に失敗しました。時間をおいて再度お試しください" },
+      { status: 500 }
+    );
   }
-
-  return NextResponse.json({ words: (data as Word[]) ?? [] });
 }

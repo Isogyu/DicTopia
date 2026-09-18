@@ -1,19 +1,22 @@
 import { WordCard } from "@/components/word/word-card";
+import { Section } from "./section";
 import type { Word } from "@/types/database";
 
-interface NewestWordsProps {
-  words: Word[];
-}
+export function NewestWords({ words }: { words: Word[] }) {
+  if (words.length === 0) return null;
 
-export function NewestWords({ words }: NewestWordsProps) {
   return (
-    <section className="container mx-auto px-4 py-12">
-      <h2 className="mb-6 text-2xl font-bold text-foreground">新着造語</h2>
-      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-        {words.slice(0, 3).map((word) => (
+    <Section
+      title="新着造語"
+      description="いま生まれたばかりの言葉たち"
+      moreHref="/words"
+      moreLabel="すべての新着を見る"
+    >
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        {words.map((word) => (
           <WordCard key={word.id} word={word} variant="grid" />
         ))}
       </div>
-    </section>
+    </Section>
   );
 }

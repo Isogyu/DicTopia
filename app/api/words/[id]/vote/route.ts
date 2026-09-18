@@ -2,7 +2,12 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { generateVoterHash } from "@/lib/hash";
+import { clientKey, rateLimit, retryAfterHeaders } from "@/lib/rate-limit";
 import type { VoteResponse, VoteStatusResponse } from "@/types/api";
+
+/** 連打・スクリプトによる大量投票の抑止（重複自体は DB の一意制約が防ぐ） */
+const RATE_LIMIT = 30;
+const RATE_WINDOW_MS = 60_000;
 
 const DUPLICATE_VOTE_ERROR = "本日はこの造語にすでに投票済みです";
 
@@ -68,6 +73,21 @@ export async function POST(
   }
 
   const wordId = params.id;
+
+  const limit = rateLimit(
+    clientKey(request, "votes:create"),
+    RATE_LIMIT,
+    RATE_WINDOW_MS
+  );
+  if (!limit.ok) {
+    return NextResponse.json(
+      {
+        success: false,
+        error: "操作が速すぎます。少し時間をおいてお試しください",
+      } as VoteResponse,
+      { status: 429, headers: retryAfterHeaders(limit) }
+    );
+  }
 
   const forwarded = request.headers.get("x-forwarded-for");
   const ip = forwarded ? forwarded.split(",")[0].trim() : "unknown";

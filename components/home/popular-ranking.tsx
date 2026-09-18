@@ -1,19 +1,24 @@
 import { WordCard } from "@/components/word/word-card";
+import { Section } from "./section";
 import type { Word } from "@/types/database";
 
-interface PopularRankingProps {
-  words: Word[];
-}
+export function PopularRanking({ words }: { words: Word[] }) {
+  if (words.length === 0) return null;
 
-export function PopularRanking({ words }: PopularRankingProps) {
   return (
-    <section className="container mx-auto px-4 py-12">
-      <h2 className="mb-6 text-2xl font-bold text-foreground">人気ランキング</h2>
-      <div className="space-y-4">
-        {words.slice(0, 5).map((word, index) => (
-          <WordCard key={word.id} word={word} variant="leaderboard" rank={index + 1} />
+    <Section
+      title="人気ランキング"
+      description="投票を集めている造語"
+      moreHref="/words?sort=popular"
+      moreLabel="ランキングをすべて見る"
+    >
+      <ol className="space-y-3">
+        {words.map((word, index) => (
+          <li key={word.id}>
+            <WordCard word={word} rank={index + 1} />
+          </li>
         ))}
-      </div>
-    </section>
+      </ol>
+    </Section>
   );
 }

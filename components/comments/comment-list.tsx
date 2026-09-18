@@ -1,36 +1,34 @@
-import { toRelativeTime } from "@/lib/relative-time";
+import { RelativeTime } from "@/components/ui/relative-time";
 import type { Comment } from "@/types/database";
 
-interface CommentListProps {
-  comments: Comment[];
-}
-
-export function CommentList({ comments }: CommentListProps) {
+export function CommentList({ comments }: { comments: Comment[] }) {
   if (comments.length === 0) {
     return (
-      <p className="text-sm text-muted-foreground">
+      <p className="rounded-xl border border-dashed border-border p-6 text-center text-sm text-muted-foreground">
         まだコメントがありません。最初のコメントを投稿してみましょう。
       </p>
     );
   }
 
   return (
-    <div className="space-y-4">
+    <ul className="space-y-3">
       {comments.map((comment) => (
-        <div
+        <li
           key={comment.id}
-          className="rounded-lg border border-border bg-card p-4 text-card-foreground shadow-sm"
+          className="rounded-xl border border-border bg-card p-4 text-card-foreground"
         >
-          <div className="mb-2 flex items-center gap-2 text-xs text-muted-foreground">
+          <div className="mb-1.5 flex items-center gap-2 text-xs text-muted-foreground">
             <span className="font-medium text-foreground">
-              {comment.nickname ?? "名無し"}
+              {comment.nickname || "名無し"}
             </span>
-            <span>・</span>
-            <span>{toRelativeTime(comment.created_at)}</span>
+            <span aria-hidden="true">・</span>
+            <RelativeTime value={comment.created_at} />
           </div>
-          <p className="whitespace-pre-wrap text-sm">{comment.body}</p>
-        </div>
+          <p className="whitespace-pre-wrap break-words text-sm leading-relaxed">
+            {comment.body}
+          </p>
+        </li>
       ))}
-    </div>
+    </ul>
   );
 }

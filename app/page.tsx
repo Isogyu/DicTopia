@@ -1,71 +1,60 @@
-import { createClient } from "@/lib/supabase/server";
+import { createPublicClient } from "@/lib/supabase/public";
+import { listWords } from "@/lib/words";
+import { getActiveTopic } from "@/lib/topics";
+import { FEATURE_WEEKLY_TOPIC } from "@/lib/config";
 import { Hero } from "@/components/home/hero";
+import { HeroTopicCard } from "@/components/home/hero-topic-card";
 import { NewestWords } from "@/components/home/newest-words";
 import { PopularRanking } from "@/components/home/popular-ranking";
 import { RecentComments } from "@/components/home/recent-comments";
-import { HeroTopicCard } from "@/components/home/hero-topic-card";
 import { BottomCta } from "@/components/home/bottom-cta";
-import { FEATURE_WEEKLY_TOPIC } from "@/lib/config";
-import type { Topic, Word, CommentWithWord } from "@/types/database";
+import type { CommentWithWord } from "@/types/database";
 
-export const dynamic = "force-dynamic";
+// 投稿の反映速度と配信コストの折衷。
+// 投稿・コメント API 側で revalidatePath するため、実際の反映はほぼ即時。
+export const revalidate = 60;
 
-type WordWithCounts = Word & {
-  comments: { count: number }[];
-  reactions: { count: number }[];
-};
+async function getRecentComments(): Promise<CommentWithWord[]> {
+  try {
+    const supabase = createPublicClient();
+    const { data } = await supabase
+      .from("comments")
+      .select("*, words!inner(word, is_published)")
+      .eq("words.is_published", true)
+      .order("created_at", { ascending: false })
+      .limit(4);
 
-function normalizeCounts(item: WordWithCounts): Word {
-  return {
-    ...item,
-    comments_count: item.comments?.[0]?.count ?? 0,
-    reactions_count: item.reactions?.[0]?.count ?? 0,
-  };
+    return (data as CommentWithWord[]) ?? [];
+  } catch {
+    return [];
+  }
 }
 
 export default async function Home() {
-  const supabase = await createClient();
-
-  const { data: activeTopic } = await supabase
-    .from("topics")
-    .select("*")
-    .eq("is_active", true)
-    .maybeSingle();
-
-  const { data: newest } = await supabase
-    .from("words")
-    .select("*, comments(count), reactions(count)")
-    .eq("is_published", true)
-    .order("created_at", { ascending: false })
-    .limit(3);
-
-  const { data: popular } = await supabase
-    .from("words")
-    .select("*, comments(count), reactions(count)")
-    .eq("is_published", true)
-    .order("votes_count", { ascending: false })
-    .limit(5);
-
-  const { data: recentComments } = await supabase
-    .from("comments")
-    .select("*, words(word)")
-    .order("created_at", { ascending: false })
-    .limit(5);
-
-  const newestWords = ((newest as WordWithCounts[]) ?? []).map(normalizeCounts);
-  const popularWords = ((popular as WordWithCounts[]) ?? []).map(normalizeCounts);
-  const recent = (recentComments as CommentWithWord[]) ?? [];
+  const [activeTopic, newest, popular, recentComments] = await Promise.all([
+    getActiveTopic(),
+    listWords({ sort: "newest", limit: 6 }),
+    listWords({ sort: "popular", limit: 5 }),
+    getRecentComments(),
+  ]);
 
   return (
     <div className="flex flex-col">
       {FEATURE_WEEKLY_TOPIC ? (
-        <HeroTopicCard topic={activeTopic as Topic | null} />
+        <HeroTopicCard topic={activeTopic} />
       ) : (
-        <Hero />
+        <Hero
+          totalWords={newest.total}
+          sampleWords={newest.words.slice(0, 3).map((w) => ({
+            id: w.id,
+            word: w.word,
+            definition: w.definition,
+          }))}
+        />
       )}
-      <NewestWords words={newestWords} />
-      <PopularRanking words={popularWords} />
-      <RecentComments comments={recent} />
+      <NewestWords words={newest.words.slice(0, 6)} />
+      <PopularRanking words={popular.words} />
+      <RecentComments comments={recentComments} />
       <BottomCta />
     </div>
   );

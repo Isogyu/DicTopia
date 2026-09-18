@@ -1,24 +1,50 @@
 import { NextRequest, NextResponse } from "next/server";
+import { safeRevalidate } from "@/lib/revalidate";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createWordSchema } from "@/lib/validation";
 import { moderateText } from "@/lib/openai/moderation";
 import { enrichWord } from "@/lib/openai/enrichment";
+import { clientKey, rateLimit, retryAfterHeaders } from "@/lib/rate-limit";
+import { categorySlug } from "@/lib/categories";
 import type { Word } from "@/types/database";
 
 const MODERATION_ERROR =
   "公序良俗に反する単語・表現が含まれているため登録できません";
 
+/**
+ * 投稿の上限。
+ * この API は 1 リクエストごとに OpenAI の moderation と enrichment を呼ぶため、
+ * 無制限だと課金と DB 汚染の両方をスクリプトで踏み荒らされる。
+ */
+const RATE_LIMIT = 5;
+const RATE_WINDOW_MS = 60_000;
+
 export async function POST(request: NextRequest) {
+  const limit = rateLimit(clientKey(request, "words:create"), RATE_LIMIT, RATE_WINDOW_MS);
+  if (!limit.ok) {
+    return NextResponse.json(
+      {
+        success: false,
+        error: "短時間に投稿しすぎています。少し時間をおいてお試しください",
+      },
+      { status: 429, headers: retryAfterHeaders(limit) }
+    );
+  }
+
   try {
     const body = (await request.json()) as unknown;
     const parse = createWordSchema.safeParse(body);
 
     if (!parse.success) {
       const messages = parse.error.issues.map((issue) => issue.message).join(" / ");
-      return NextResponse.json({ error: messages }, { status: 400 });
+      return NextResponse.json(
+        { success: false, error: messages },
+        { status: 400 }
+      );
     }
 
-    const { word, definition, example_sentence, topic_id, nickname, category } = parse.data;
+    const { word, definition, example_sentence, topic_id, nickname, category } =
+      parse.data;
 
     const textToModerate = [word, definition, example_sentence]
       .filter((s): s is string => typeof s === "string" && s.length > 0)
@@ -29,7 +55,11 @@ export async function POST(request: NextRequest) {
       flagged = await moderateText(textToModerate);
     } catch {
       return NextResponse.json(
-        { error: "モデレーションの判定に失敗しました。時間をおいて再度お試しください" },
+        {
+          success: false,
+          error:
+            "モデレーションの判定に失敗しました。時間をおいて再度お試しください",
+        },
         { status: 500 }
       );
     }
@@ -48,10 +78,10 @@ export async function POST(request: NextRequest) {
       .insert({
         word,
         definition,
-        example_sentence: example_sentence ?? null,
+        example_sentence: example_sentence?.trim() || null,
         topic_id: topic_id ?? null,
         is_published: true,
-        nickname: nickname ?? null,
+        nickname: nickname?.trim() || null,
         category,
         user_id: null,
       })
@@ -64,18 +94,28 @@ export async function POST(request: NextRequest) {
         insertError.code === "23503"
       ) {
         return NextResponse.json(
-          { error: "指定されたお題が存在しません" },
+          { success: false, error: "指定されたお題が存在しません" },
           { status: 400 }
         );
       }
 
       return NextResponse.json(
-        { error: "造語の登録に失敗しました。時間をおいて再度お試しください" },
+        {
+          success: false,
+          error: "造語の登録に失敗しました。時間をおいて再度お試しください",
+        },
         { status: 500 }
       );
     }
 
     const createdWord = created as Word;
+
+    // ISR のキャッシュを明示的に破棄し、投稿が即座に一覧へ出るようにする
+    safeRevalidate(
+      "/",
+      "/words",
+      `/words/${categorySlug(createdWord.category)}`
+    );
 
     // 非同期SEOエンリッチメント：レスポンス返却を待たない
     enrichWord(word, definition, example_sentence)
@@ -88,6 +128,7 @@ export async function POST(request: NextRequest) {
             ai_search_summary: result.summary,
           })
           .eq("id", createdWord.id);
+        safeRevalidate(`/word/${createdWord.id}`);
       })
       .catch(() => {
         // エンリッチメント失敗は主処理に影響しない
@@ -99,7 +140,7 @@ export async function POST(request: NextRequest) {
     );
   } catch {
     return NextResponse.json(
-      { error: "リクエストの処理に失敗しました" },
+      { success: false, error: "リクエストの処理に失敗しました" },
       { status: 500 }
     );
   }
